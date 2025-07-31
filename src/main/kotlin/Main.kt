@@ -23,7 +23,7 @@ fun main() {
             } catch (e: NumberFormatException) {
                 dictionaryList.add(word)
             }
-
+            splitWord.size == 2 -> dictionaryList.add(word)
             splitWord.size < 2 -> continue
         }
     }
