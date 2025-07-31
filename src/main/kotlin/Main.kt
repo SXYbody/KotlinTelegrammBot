@@ -5,7 +5,7 @@ import java.io.File
 data class Word(
     val original: String,
     val translate: String,
-    var correctAnswersCount: String? = "0",
+    var correctAnswersCount: Int = 0,
 )
 
 fun main() {
@@ -17,9 +17,15 @@ fun main() {
     for (i in file.readLines()) {
         val splitWord = i.split("|")
         val word = Word(splitWord[0], splitWord[1])
-        if (splitWord.getOrNull(2) != null) dictionaryList.add(word.copy(correctAnswersCount = splitWord[2])) else dictionaryList.add(
-            word
-        )
+        when {
+            splitWord.size == 3 -> try {
+                dictionaryList.add(word.copy(correctAnswersCount = splitWord.last().toInt()))
+            } catch (e: NumberFormatException) {
+                dictionaryList.add(word)
+            }
+
+            splitWord.size < 2 -> continue
+        }
     }
     dictionaryList.forEach { println(it) }
 }
