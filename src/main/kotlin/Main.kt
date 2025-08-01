@@ -8,7 +8,7 @@ data class Word(
     var correctAnswersCount: Int = 0,
 )
 
-fun main() {
+fun loadDictionary(): MutableList<Word> {
     val file = File("dictionary")
     file.createNewFile()
 
@@ -23,9 +23,26 @@ fun main() {
             } catch (e: NumberFormatException) {
                 dictionaryList.add(word)
             }
+
             splitWord.size == 2 -> dictionaryList.add(word)
             splitWord.size < 2 -> continue
         }
     }
-    dictionaryList.forEach { println(it) }
+    return dictionaryList
+}
+
+fun main() {
+    val dictionary = loadDictionary()
+
+    do {
+        println("Меню: \n1 – Учить слова \n2 – Статистика \n0 – Выход")
+        val userNumber = readln()
+        when (userNumber) {
+            "1" -> println("Вы выбрали учить слова.")
+            "2" -> println("Вы выбрали посмотреть статистику")
+            "0" -> break
+            else -> println("Введите число 1, 2 или 0")
+        }
+
+    } while (true)
 }
