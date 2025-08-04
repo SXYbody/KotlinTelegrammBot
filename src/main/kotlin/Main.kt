@@ -1,6 +1,9 @@
 package org.example
 
 import java.io.File
+import kotlin.math.ceil
+
+const val NUMBERS_PERCENTAGE = 100
 
 data class Word(
     val original: String,
@@ -31,6 +34,13 @@ fun loadDictionary(): MutableList<Word> {
     return dictionaryList
 }
 
+fun getStatistics(): String {
+    val totalCount: Int = loadDictionary().size
+    val learnedCount: Int = loadDictionary().filter { it.correctAnswersCount >= 3 }.size
+    val percent = (learnedCount.toDouble() / totalCount.toDouble()) * NUMBERS_PERCENTAGE
+    return "Выучено: $learnedCount из $totalCount слов | ${String.format("%.0f", percent)}%"
+}
+
 fun main() {
     val dictionary = loadDictionary()
 
@@ -39,7 +49,7 @@ fun main() {
         val userNumber = readln()
         when (userNumber) {
             "1" -> println("Вы выбрали учить слова.")
-            "2" -> println("Вы выбрали посмотреть статистику")
+            "2" -> println(getStatistics())
             "0" -> break
             else -> println("Введите число 1, 2 или 0")
         }
