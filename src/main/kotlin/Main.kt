@@ -1,9 +1,9 @@
 package org.example
 
 import java.io.File
-import kotlin.math.ceil
 
 const val NUMBERS_PERCENTAGE = 100
+const val MAX_CORRECT_COUNT = 3
 
 data class Word(
     val original: String,
@@ -35,8 +35,9 @@ fun loadDictionary(): MutableList<Word> {
 }
 
 fun getStatistics(): String {
-    val totalCount: Int = loadDictionary().size
-    val learnedCount: Int = loadDictionary().filter { it.correctAnswersCount >= 3 }.size
+    val dictionary = loadDictionary()
+    val totalCount: Int = dictionary.size
+    val learnedCount: Int = dictionary.filter { it.correctAnswersCount >= MAX_CORRECT_COUNT }.size
     val percent = (learnedCount.toDouble() / totalCount.toDouble()) * NUMBERS_PERCENTAGE
     return "Выучено: $learnedCount из $totalCount слов | ${String.format("%.0f", percent)}%"
 }
