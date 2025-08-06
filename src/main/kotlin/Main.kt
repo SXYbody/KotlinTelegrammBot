@@ -42,6 +42,36 @@ fun getStatistics(): String {
     return "Выучено: $learnedCount из $totalCount слов | ${String.format("%.0f", percent)}%"
 }
 
+fun startLearnWords() {
+    val dictionary = loadDictionary()
+    val notLearnedList = dictionary.filter { it.correctAnswersCount < MAX_CORRECT_COUNT }
+
+    do {
+        if (notLearnedList.size > 0) {
+            val questionWords = notLearnedList.shuffled().take(4)
+
+            val correctAnswer = questionWords.random()
+            val learnWord = """
+                
+                ${correctAnswer.original}:
+                1 - ${questionWords[0].translate}
+                2 - ${questionWords[1].translate}
+                3 - ${questionWords[2].translate}
+                4 - ${questionWords[3].translate}
+            """.trimIndent()
+
+            println(learnWord)
+
+            val userAnswer = readln()
+
+        } else {
+            println("Все слова уже выученны!")
+            return
+        }
+
+    } while (true)
+}
+
 fun main() {
     val dictionary = loadDictionary()
 
@@ -49,7 +79,7 @@ fun main() {
         println("Меню: \n1 – Учить слова \n2 – Статистика \n0 – Выход")
         val userNumber = readln()
         when (userNumber) {
-            "1" -> println("Вы выбрали учить слова.")
+            "1" -> println(startLearnWords())
             "2" -> println(getStatistics())
             "0" -> break
             else -> println("Введите число 1, 2 или 0")
