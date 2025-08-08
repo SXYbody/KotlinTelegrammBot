@@ -4,6 +4,8 @@ import java.io.File
 
 const val NUMBERS_PERCENTAGE = 100
 const val MAX_CORRECT_COUNT = 3
+const val MAX_QUESTION_WORDS = 4
+const val FAULT_WORD_LIST = 1
 
 data class Word(
     val original: String,
@@ -48,22 +50,15 @@ fun startLearnWords() {
 
     do {
         if (notLearnedList.size > 0) {
-            val questionWords = notLearnedList.shuffled().take(4)
-
+            val questionWords = notLearnedList.shuffled().take(MAX_QUESTION_WORDS)
             val correctAnswer = questionWords.random()
-            val learnWord = """
-                
-                ${correctAnswer.original}:
-                1 - ${questionWords[0].translate}
-                2 - ${questionWords[1].translate}
-                3 - ${questionWords[2].translate}
-                4 - ${questionWords[3].translate}
-            """.trimIndent()
+
+            var learnWord = correctAnswer.original
+            for (i in questionWords) learnWord += "\n${questionWords.indexOf(i) + FAULT_WORD_LIST} - ${i.translate}"
 
             println(learnWord)
 
             val userAnswer = readln()
-
         } else {
             println("Все слова уже выученны!")
             return
