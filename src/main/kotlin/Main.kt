@@ -4,6 +4,8 @@ import java.io.File
 
 const val NUMBERS_PERCENTAGE = 100
 const val MAX_CORRECT_COUNT = 3
+const val MAX_QUESTION_WORDS = 4
+const val FAULT_WORD_LIST = 1
 
 data class Word(
     val original: String,
@@ -42,6 +44,29 @@ fun getStatistics(): String {
     return "Выучено: $learnedCount из $totalCount слов | ${String.format("%.0f", percent)}%"
 }
 
+fun startLearnWords() {
+    val dictionary = loadDictionary()
+    val notLearnedList = dictionary.filter { it.correctAnswersCount < MAX_CORRECT_COUNT }
+
+    do {
+        if (notLearnedList.size > 0) {
+            val questionWords = notLearnedList.shuffled().take(MAX_QUESTION_WORDS)
+            val correctAnswer = questionWords.random()
+
+            var learnWord = correctAnswer.original
+            for (i in questionWords) learnWord += "\n${questionWords.indexOf(i) + FAULT_WORD_LIST} - ${i.translate}"
+
+            println(learnWord)
+
+            val userAnswer = readln()
+        } else {
+            println("Все слова уже выученны!")
+            return
+        }
+
+    } while (true)
+}
+
 fun main() {
     val dictionary = loadDictionary()
 
@@ -49,7 +74,7 @@ fun main() {
         println("Меню: \n1 – Учить слова \n2 – Статистика \n0 – Выход")
         val userNumber = readln()
         when (userNumber) {
-            "1" -> println("Вы выбрали учить слова.")
+            "1" -> println(startLearnWords())
             "2" -> println(getStatistics())
             "0" -> break
             else -> println("Введите число 1, 2 или 0")
