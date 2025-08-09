@@ -39,11 +39,12 @@ fun loadDictionary(): MutableList<Word> {
 
 fun saveDictionary(dictionary: MutableList<Word>) {
     val file = File("dictionary")
-    var textToFile = ""
+    file.delete()
+    file.createNewFile()
+
     dictionary.forEach {
-        textToFile += "${it.original}|${it.translate}|${it.correctAnswersCount}\n"
+        file.appendText(text = "${it.original}|${it.translate}|${it.correctAnswersCount}\n")
     }
-    file.writeText(textToFile)
 }
 
 fun getStatistics(): String {
