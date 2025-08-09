@@ -1,6 +1,7 @@
 package org.example
 
 import java.io.File
+import java.util.Dictionary
 
 const val NUMBERS_PERCENTAGE = 100
 const val MAX_CORRECT_COUNT = 3
@@ -36,6 +37,15 @@ fun loadDictionary(): MutableList<Word> {
     return dictionaryList
 }
 
+fun saveDictionary(dictionary: MutableList<Word>) {
+    val file = File("dictionary")
+    var textToFile = ""
+    dictionary.forEach {
+        textToFile += "${it.original}|${it.translate}|${it.correctAnswersCount}\n"
+    }
+    file.writeText(textToFile)
+}
+
 fun getStatistics(): String {
     val dictionary = loadDictionary()
     val totalCount: Int = dictionary.size
@@ -52,18 +62,32 @@ fun startLearnWords() {
         if (notLearnedList.size > 0) {
             val questionWords = notLearnedList.shuffled().take(MAX_QUESTION_WORDS)
             val correctAnswer = questionWords.random()
+            val correctAnswerId = questionWords.indexOf(correctAnswer)
 
             var learnWord = correctAnswer.original
             for (i in questionWords) learnWord += "\n${questionWords.indexOf(i) + FAULT_WORD_LIST} - ${i.translate}"
-
+            learnWord += "\n---------- \n0 - Меню"
             println(learnWord)
 
-            val userAnswer = readln()
+            val userAnswerInPut = readln()
+            try {
+                if (userAnswerInPut.toInt() == correctAnswerId + FAULT_WORD_LIST) {
+                    println("Правильно!")
+                    correctAnswer.correctAnswersCount++
+                    saveDictionary(dictionary)
+                } else if (userAnswerInPut.toInt() == 0) {
+                    break
+                } else {
+                    println("Неправильно! ${correctAnswer.original} – это ${correctAnswer.translate}")
+                }
+            } catch (e: NumberFormatException) {
+                println("Неправильно! ${correctAnswer.original} – это ${correctAnswer.translate}")
+            }
+
         } else {
             println("Все слова уже выученны!")
             return
         }
-
     } while (true)
 }
 
