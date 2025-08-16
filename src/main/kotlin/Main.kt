@@ -19,7 +19,7 @@ fun Question.printQuestionString(): String {
 }
 
 fun startLearnWords() {
-    val trainer = LearnWordsTrainer()
+    val trainer = LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
 
     do {
         val question = trainer.nextQuestion()
@@ -34,7 +34,6 @@ fun startLearnWords() {
                     userAnswerInPut.toInt() == 0 -> break
                     checkAnswer -> println("Правильно!")
                     !checkAnswer -> println("Неправильно! ${question.correctAnswer.original} – это ${question.correctAnswer.translate}")
-                    else -> println("Неправильно! ${question.correctAnswer.original} – это ${question.correctAnswer.translate}")
                 }
             } catch (e: NumberFormatException) {
                 println("Неправильно! ${question.correctAnswer.original} – это ${question.correctAnswer.translate}")
@@ -49,7 +48,7 @@ fun startLearnWords() {
 }
 
 fun main() {
-    val trainer = LearnWordsTrainer()
+    val trainer = LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
 
     do {
         println("Меню: \n1 – Учить слова \n2 – Статистика \n0 – Выход")
