@@ -30,7 +30,11 @@ class LearnWordsTrainer(
     }
 
     fun nextQuestion(): Question? {
-        val notLearnedList = dictionary.filter { it.correctAnswersCount < maxCorrectCount }
+        var notLearnedList = dictionary.filter { it.correctAnswersCount < maxCorrectCount }
+        if (notLearnedList.size <= maxQuestionWords) {
+            val learnedList = dictionary.filter { it.correctAnswersCount >= maxCorrectCount }.shuffled().take(maxQuestionWords)
+            notLearnedList = notLearnedList + learnedList
+        }
 
         if (notLearnedList.isEmpty()) return null
         val questionWords = notLearnedList.shuffled().take(maxQuestionWords)
