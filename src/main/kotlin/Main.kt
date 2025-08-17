@@ -1,5 +1,7 @@
 package org.example
 
+import java.lang.Exception
+
 const val NUMBERS_PERCENTAGE = 100
 const val MAX_CORRECT_COUNT = 3
 const val MAX_QUESTION_WORDS = 4
@@ -19,7 +21,12 @@ fun Question.printQuestionString(): String {
 }
 
 fun startLearnWords() {
-    val trainer = LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
+    val trainer = try {
+        LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
+    } catch (e: Exception){
+        println("Неккоректный файл")
+        return
+    }
 
     do {
         val question = trainer.nextQuestion()
@@ -48,7 +55,12 @@ fun startLearnWords() {
 }
 
 fun main() {
-    val trainer = LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
+    val trainer = try {
+        LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
+    } catch (e: Exception){
+        println("Неккоректный файл")
+        return
+    }
 
     do {
         println("Меню: \n1 – Учить слова \n2 – Статистика \n0 – Выход")
