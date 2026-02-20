@@ -8,9 +8,9 @@ import java.net.http.HttpResponse
 const val TELEGRAM_BASE_URL = "https://api.telegram.org/bot"
 
 fun main(args: Array<String>) {
-    val botUrl = args[0]
-    val urlGetMe = "$TELEGRAM_BASE_URL$botUrl/getMe"
-    val urlGetUpdates = "$TELEGRAM_BASE_URL$botUrl/getUpdates"
+    val botToken = args[0]
+    val urlGetMe = "$TELEGRAM_BASE_URL$botToken/getMe"
+    val urlGetUpdates = "$TELEGRAM_BASE_URL$botToken/getUpdates"
 
     val client = HttpClient.newBuilder().build()
 
