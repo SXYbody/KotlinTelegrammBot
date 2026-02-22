@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
         println(updates)
 
         val startUpdateId = updates.lastIndexOf("update_id")
-        val endUpdateId = updates.lastIndexOf(",\n\"")
+        val endUpdateId = updates.indexOf(",", startUpdateId + 11)
         if (startUpdateId == -1 || endUpdateId == -1) continue
 
         val updateIdString = updates.substring(startUpdateId + 11, endUpdateId)
