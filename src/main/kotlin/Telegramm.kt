@@ -27,8 +27,10 @@ fun main(args: Array<String>) {
         val matchResultId: MatchResult? = updateIdRegex.find(updates)
         val groupsId = matchResultId?.groups
 
-        val id = groupsId?.get(1)?.value
-        println(id)
+        val idText = groupsId?.get(1)?.value
+        val updateId = idText?.toInt()?.plus(1) ?: updateId
+
+        println(updateId)
     }
 }
 
