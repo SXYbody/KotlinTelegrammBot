@@ -23,12 +23,12 @@ fun main(args: Array<String>) {
         val text = groups?.get(1)?.value
         println(text)
 
-        val updateIdRegex: Regex = "\"update_id\":(.+?),\n".toRegex()
+        val updateIdRegex: Regex = "\"update_id\":(\\d+)".toRegex()
         val matchResultId: MatchResult? = updateIdRegex.find(updates)
         val groupsId = matchResultId?.groups
 
         val idText = groupsId?.get(1)?.value
-        val updateId = idText?.toInt()?.plus(1) ?: updateId
+        updateId = idText?.toInt()?.plus(1) ?: updateId
 
         println(updateId)
     }
