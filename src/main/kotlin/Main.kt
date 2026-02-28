@@ -7,12 +7,6 @@ const val MAX_CORRECT_COUNT = 3
 const val MAX_QUESTION_WORDS = 4
 const val FAULT_WORD_LIST = 1
 
-data class Word(
-    val original: String,
-    val translate: String,
-    var correctAnswersCount: Int = 0,
-)
-
 fun Question.printQuestionString(): String {
     var learnWord = this.correctAnswer.original
     for (i in this.wordList) learnWord += "\n${this.wordList.indexOf(i) + FAULT_WORD_LIST} - ${i.translate}"
