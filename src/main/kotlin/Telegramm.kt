@@ -3,10 +3,15 @@ package org.example
 import org.example.TelegramBotService.getUpdates
 import java.lang.Exception
 
+const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+const val DATA_STATISTIC = "statistics_clicked"
+const val DATA_LEARN_WORD = "learn_word_clicked"
+const val DATA_MENU = "/start"
+
 fun main(args: Array<String>) {
     val trainer = try {
         LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
-    } catch (e: Exception){
+    } catch (e: Exception) {
         println("Неккоректный файл")
         return
     }
@@ -41,16 +46,20 @@ fun main(args: Array<String>) {
 
         val matchResultData: MatchResult? = messageDataRegex.find(updates)
         val groupsData = matchResultData?.groups
-        val dataText: String = groupsData?.get(1)?.value ?: continue
+        val dataText: String? = groupsData?.get(1)?.value
 
-        if (text == "Hello") TelegramBotService.sendMessage(text, chatId, botToken)
+        when {
+            text == DATA_MENU -> TelegramBotService.sendMenu(chatId, botToken)
+            dataText == DATA_STATISTIC -> {
+                TelegramBotService.sendMessage(
+                    "Выученно ${trainer.getStatistics().learned} из ${trainer.getStatistics().total} " +
+                            "| ${String.format("%.0f", trainer.getStatistics().percent)}%",
+                    chatId,
+                    botToken,
+                )
+            }
 
-        if (text == "/start") TelegramBotService.sendMenu(chatId, botToken)
-
-        if (dataText == "statistics_clicked") TelegramBotService.sendMessage(
-            "Вы выучили 100% слов",
-            chatId,
-            botToken,
-        )
+            dataText == DATA_LEARN_WORD -> TelegramBotService.sendNextQuestionAndSend(trainer, chatId, botToken)
+        }
     }
 }
