@@ -3,6 +3,10 @@ package org.example
 import org.example.TelegramBotService.getUpdates
 import java.lang.Exception
 
+const val dataStatistic: String = "statistics_clicked"
+const val dataLearnWords: String = "learn_words_clicked"
+const val dataBotMenu: String = "/start"
+
 fun main(args: Array<String>) {
     val trainer = try {
         LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
@@ -41,14 +45,13 @@ fun main(args: Array<String>) {
 
         val matchResultData: MatchResult? = messageDataRegex.find(updates)
         val groupsData = matchResultData?.groups
-        val dataText: String = groupsData?.get(1)?.value ?: continue
+        val dataText: String? = groupsData?.get(1)?.value
 
-        if (text == "Hello") TelegramBotService.sendMessage(text, chatId, botToken)
+        if (text == dataBotMenu) TelegramBotService.sendMenu(chatId, botToken)
 
-        if (text == "/start") TelegramBotService.sendMenu(chatId, botToken)
-
-        if (dataText == "statistics_clicked") TelegramBotService.sendMessage(
-            "Вы выучили 100% слов",
+        if (dataText == dataStatistic) TelegramBotService.sendMessage(
+            "Выученно ${trainer.getStatistics().learned} из ${trainer.getStatistics().total} " +
+                    "| ${String.format("%.0f", trainer.getStatistics().percent)}%",
             chatId,
             botToken,
         )
