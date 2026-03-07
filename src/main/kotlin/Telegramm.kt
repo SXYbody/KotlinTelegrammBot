@@ -1,16 +1,19 @@
 package org.example
 
+import org.example.TelegramBotService.checkNextQuestionAndSend
 import org.example.TelegramBotService.getUpdates
+import org.example.TelegramBotService.sendMessage
 import java.lang.Exception
 
-const val dataStatistic: String = "statistics_clicked"
-const val dataLearnWords: String = "learn_words_clicked"
-const val dataBotMenu: String = "/start"
+const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+const val DATA_STATISTIC = "statistics_clicked"
+const val DATA_LEARN_WORD = "learn_word_clicked"
+const val DATA_MENU = "/start"
 
 fun main(args: Array<String>) {
     val trainer = try {
         LearnWordsTrainer(MAX_CORRECT_COUNT, MAX_QUESTION_WORDS)
-    } catch (e: Exception){
+    } catch (e: Exception) {
         println("Неккоректный файл")
         return
     }
@@ -47,13 +50,27 @@ fun main(args: Array<String>) {
         val groupsData = matchResultData?.groups
         val dataText: String? = groupsData?.get(1)?.value
 
-        if (text == dataBotMenu) TelegramBotService.sendMenu(chatId, botToken)
+        when {
+            text == DATA_MENU -> TelegramBotService.sendMenu(chatId, botToken)
+            dataText == DATA_STATISTIC -> {
+                sendMessage(
+                    "Выученно ${trainer.getStatistics().learned} из ${trainer.getStatistics().total} " +
+                            "| ${String.format("%.0f", trainer.getStatistics().percent)}%",
+                    chatId,
+                    botToken,
+                )
+            }
 
-        if (dataText == dataStatistic) TelegramBotService.sendMessage(
-            "Выученно ${trainer.getStatistics().learned} из ${trainer.getStatistics().total} " +
-                    "| ${String.format("%.0f", trainer.getStatistics().percent)}%",
-            chatId,
-            botToken,
-        )
+            dataText == DATA_LEARN_WORD -> {
+                val question: Question? = checkNextQuestionAndSend(trainer)
+                if (question == null) {
+                    sendMessage(
+                        "Все слова в словаре выучены",
+                        chatId,
+                        botToken,
+                    )
+                } else TelegramBotService.sendNextQuestionAndSend(question, botToken, chatId)
+            }
+        }
     }
 }
