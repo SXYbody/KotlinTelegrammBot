@@ -28,43 +28,32 @@ object TelegramBotService {
         return response.body()
     }
 
-    fun sendNextQuestionAndSend(trainer: LearnWordsTrainer, chatId: String, botToken: String): String {
-        val urlSendMessage = "$TELEGRAM_BASE_URL$botToken/sendMessage"
-        val question = trainer.nextQuestion()
+    fun checkNextQuestionAndSend(trainer: LearnWordsTrainer): Question? {
+        val question = trainer.nextQuestion() ?: return null
+        return question
+    }
 
-        if (question == null) {
-            val message = sendMessage(
-                "Все слова в словаре выучены",
-                chatId,
-                botToken,
-            )
-            return message
-        }
+    fun sendNextQuestionAndSend(question: Question, chatId: String, botToken: String): String {
+        val urlSendMessage = "$TELEGRAM_BASE_URL$botToken/sendMessage"
+
+        val keyboardButton: String = question.wordList.mapIndexed { index, word ->
+            """
+                [
+                    {
+                        "text": "${word.translate}",
+                        "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}${index}"
+                    }
+                ]  
+                """.trimIndent()
+        }.joinToString(",")
 
         val sendLearnWordMenu = """
             {
                 "chat_id": $chatId,
                 "text": "Как переводиться слово: ${question.correctAnswer.original}",
                 "reply_markup": {
-                    "inline_keyboard": [
-                        [
-                            {
-                                "text": "${question.wordList[0].translate}",
-                                "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}0"
-                            },
-                            {
-                                "text": "${question.wordList[1].translate}",
-                                "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}1"
-                            },
-                            {
-                                "text": "${question.wordList[2].translate}",
-                                "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}2"
-                            },
-                            {
-                                "text": "${question.wordList[3].translate}",
-                                "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}3"
-                            }
-                        ]
+                    "inline_keyboard": [                   
+                         $keyboardButton                      
                     ]
                 }
             }

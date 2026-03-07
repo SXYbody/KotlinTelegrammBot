@@ -1,6 +1,8 @@
 package org.example
 
+import org.example.TelegramBotService.checkNextQuestionAndSend
 import org.example.TelegramBotService.getUpdates
+import org.example.TelegramBotService.sendMessage
 import java.lang.Exception
 
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
@@ -51,7 +53,7 @@ fun main(args: Array<String>) {
         when {
             text == DATA_MENU -> TelegramBotService.sendMenu(chatId, botToken)
             dataText == DATA_STATISTIC -> {
-                TelegramBotService.sendMessage(
+                sendMessage(
                     "Выученно ${trainer.getStatistics().learned} из ${trainer.getStatistics().total} " +
                             "| ${String.format("%.0f", trainer.getStatistics().percent)}%",
                     chatId,
@@ -59,7 +61,16 @@ fun main(args: Array<String>) {
                 )
             }
 
-            dataText == DATA_LEARN_WORD -> TelegramBotService.sendNextQuestionAndSend(trainer, chatId, botToken)
+            dataText == DATA_LEARN_WORD -> {
+                val question: Question? = checkNextQuestionAndSend(trainer)
+                if (question == null) {
+                    sendMessage(
+                        "Все слова в словаре выучены",
+                        chatId,
+                        botToken,
+                    )
+                } else TelegramBotService.sendNextQuestionAndSend(question, botToken, chatId)
+            }
         }
     }
 }
