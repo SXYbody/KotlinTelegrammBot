@@ -62,14 +62,7 @@ fun main(args: Array<String>) {
             }
 
             dataText == DATA_LEARN_WORD -> {
-                val question: Question? = checkNextQuestionAndSend(trainer)
-                if (question == null) {
-                    sendMessage(
-                        "Все слова в словаре выучены",
-                        chatId,
-                        botToken,
-                    )
-                } else TelegramBotService.sendNextQuestionAndSend(question, botToken, chatId)
+                checkNextQuestionAndSend(trainer, chatId, botToken)
             }
         }
     }

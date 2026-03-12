@@ -28,45 +28,6 @@ object TelegramBotService {
         return response.body()
     }
 
-    fun checkNextQuestionAndSend(trainer: LearnWordsTrainer): Question? {
-        val question = trainer.nextQuestion() ?: return null
-        return question
-    }
-
-    fun sendNextQuestionAndSend(question: Question, chatId: String, botToken: String): String {
-        val urlSendMessage = "$TELEGRAM_BASE_URL$botToken/sendMessage"
-
-        val keyboardButton: String = question.wordList.mapIndexed { index, word ->
-            """
-                [
-                    {
-                        "text": "${word.translate}",
-                        "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}${index}"
-                    }
-                ]  
-                """.trimIndent()
-        }.joinToString(",")
-
-        val sendLearnWordMenu = """
-            {
-                "chat_id": $chatId,
-                "text": "Как переводиться слово: ${question.correctAnswer.original}",
-                "reply_markup": {
-                    "inline_keyboard": [                   
-                         $keyboardButton                      
-                    ]
-                }
-            }
-        """.trimIndent()
-
-        val request = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
-            .header("content-type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(sendLearnWordMenu))
-            .build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
-    }
-
     fun sendMenu(chatId: String, botToken: String): String? {
         val urlSendMessage = "$TELEGRAM_BASE_URL$botToken/sendMessage"
 
@@ -95,6 +56,50 @@ object TelegramBotService {
         val request = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(sendMenuBody))
+            .build()
+        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body()
+    }
+
+    fun checkNextQuestionAndSend(trainer: LearnWordsTrainer, chatId: String, botToken: String): String {
+        val question = trainer.nextQuestion() ?: return sendMessage(
+            "Все слова в словаре выучены",
+            chatId,
+            botToken,
+        )
+
+        return sendNextQuestionAndSend(question, chatId, botToken)
+    }
+
+    private fun sendNextQuestionAndSend(question: Question, chatId: String, botToken: String): String {
+        val urlSendMessage = "$TELEGRAM_BASE_URL$botToken/sendMessage"
+
+        val keyboardButton: String = question.wordList.mapIndexed { index, word ->
+            """
+                [
+                    {
+                        "text": "${word.translate}",
+                        "callback_data": "${CALLBACK_DATA_ANSWER_PREFIX}${index}"
+                    }
+                ]  
+                """.trimIndent()
+        }.joinToString(",")
+
+        val sendLearnWordMenu = """
+            {
+                "chat_id": $chatId,
+                "text": "Как переводиться слово: ${question.correctAnswer.original}",
+                "reply_markup": {
+                    "inline_keyboard": [                   
+                         $keyboardButton                      
+                    ]
+                }
+            }
+        """.trimIndent()
+
+        val request = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
+            .header("content-type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(sendLearnWordMenu))
             .build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
