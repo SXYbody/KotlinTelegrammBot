@@ -64,6 +64,25 @@ fun main(args: Array<String>) {
             dataText == DATA_LEARN_WORD -> {
                 checkNextQuestionAndSend(trainer, chatId, botToken)
             }
+
+            dataText?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true -> {
+                val answerId: String = dataText.substringAfter(CALLBACK_DATA_ANSWER_PREFIX)
+                if (trainer.checkAnswer(answerId)) {
+                    sendMessage(
+                        "Правильно!",
+                        chatId,
+                        botToken,
+                    )
+                } else {
+                    sendMessage(
+                        "Неправильно! ${trainer.question?.correctAnswer?.original} " +
+                                "– это ${trainer.question?.correctAnswer?.translate}",
+                        chatId,
+                        botToken,
+                    )
+                }
+                checkNextQuestionAndSend(trainer, chatId, botToken)
+            }
         }
     }
 }
